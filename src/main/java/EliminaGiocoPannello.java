@@ -2,12 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import org.json.JSONObject;
 
-public class DeleteGamePanel extends JPanel {
-    private GamesManagerClient mainApp;
+public class EliminaGiocoPannello extends JPanel {
+    private API_CLIENT mainApp;
     private JTextField idField, titleField, categoryField, pegiField;
     private JButton deleteButton;
 
-    public DeleteGamePanel(GamesManagerClient mainApp) {
+    public EliminaGiocoPannello(API_CLIENT mainApp) {
         this.mainApp = mainApp;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -88,11 +88,11 @@ public class DeleteGamePanel extends JPanel {
         try {
             String id = idField.getText().trim();
             if (id.isEmpty()) {
-                mainApp.appendToOutput("Please enter a game ID");
+                mainApp.aggiungiOutput("Please enter a game ID");
                 return;
             }
 
-            mainApp.clearOutput();
+            mainApp.pulisciOutput();
             JSONObject game = mainApp.readGame(id);
 
             if (game.has("titolo")) {
@@ -108,7 +108,7 @@ public class DeleteGamePanel extends JPanel {
             }
 
         } catch (Exception ex) {
-            mainApp.appendToOutput("Error finding game: " + ex.getMessage());
+            mainApp.aggiungiOutput("Error finding game: " + ex.getMessage());
             ex.printStackTrace();
             deleteButton.setEnabled(false);
         }
@@ -135,11 +135,11 @@ public class DeleteGamePanel extends JPanel {
         try {
             String id = idField.getText().trim();
             if (id.isEmpty()) {
-                mainApp.appendToOutput("Game ID is missing");
+                mainApp.aggiungiOutput("Game ID is missing");
                 return;
             }
 
-            mainApp.clearOutput();
+            mainApp.pulisciOutput();
             JSONObject response = mainApp.deleteGame(id);
 
             if (response.length() > 0) {
@@ -148,7 +148,7 @@ public class DeleteGamePanel extends JPanel {
             }
 
         } catch (Exception ex) {
-            mainApp.appendToOutput("Error deleting game: " + ex.getMessage());
+            mainApp.aggiungiOutput("Error deleting game: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -158,7 +158,7 @@ public class DeleteGamePanel extends JPanel {
         titleField.setText("");
         categoryField.setText("");
         pegiField.setText("");
-        mainApp.clearOutput();
+        mainApp.pulisciOutput();
         deleteButton.setEnabled(false);
     }
 }

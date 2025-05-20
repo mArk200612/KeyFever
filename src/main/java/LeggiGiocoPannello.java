@@ -2,14 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import org.json.JSONObject;
 
-public class UpdateGamePanel extends JPanel {
-    private GamesManagerClient mainApp;
+public class LeggiGiocoPannello extends JPanel {
+    private API_CLIENT mainApp;
     private JTextField idField, titleField, pegiField, priceField, imageField, youtubeField, developerField, yearField;
     private JTextArea descriptionArea;
     private JComboBox<String> categoryComboBox;
-    private JButton updateButton;
 
-    public UpdateGamePanel(GamesManagerClient mainApp) {
+    public LeggiGiocoPannello(API_CLIENT mainApp) {
         this.mainApp = mainApp;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -18,21 +17,14 @@ public class UpdateGamePanel extends JPanel {
         JPanel searchPanel = createSearchPanel();
         add(searchPanel, BorderLayout.NORTH);
 
-        // Form panel in center
-        JPanel formPanel = createFormPanel();
-        add(formPanel, BorderLayout.CENTER);
-
-        // Button panel at bottom
-        JPanel buttonPanel = createButtonPanel();
-        add(buttonPanel, BorderLayout.SOUTH);
-
-        // Initially disable update button until a game is loaded
-        updateButton.setEnabled(false);
+        // Game details panel
+        JPanel detailsPanel = createDetailsPanel();
+        add(detailsPanel, BorderLayout.CENTER);
     }
 
     private JPanel createSearchPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Find Game to Update"));
+        panel.setBorder(BorderFactory.createTitledBorder("Find Game by ID"));
 
         JLabel idLabel = new JLabel("Game ID:");
         idField = new JTextField(10);
@@ -50,21 +42,38 @@ public class UpdateGamePanel extends JPanel {
         return panel;
     }
 
-    private JPanel createFormPanel() {
+    private JPanel createDetailsPanel() {
         JPanel panel = new JPanel(new GridLayout(9, 2, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Edit Game Details"));
+        panel.setBorder(BorderFactory.createTitledBorder("Game Details"));
 
-        // Initialize fields
+        // Initialize fields (all read-only)
         titleField = new JTextField();
-        categoryComboBox = new JComboBox<>(GamesManagerClient.getGameCategories());
+        titleField.setEditable(false);
+
+        categoryComboBox = new JComboBox<>(API_CLIENT.getCategorieGiochi());
+        categoryComboBox.setEnabled(false);
+
         pegiField = new JTextField();
+        pegiField.setEditable(false);
+
         descriptionArea = new JTextArea(5, 20);
+        descriptionArea.setEditable(false);
         JScrollPane descScrollPane = new JScrollPane(descriptionArea);
+
         priceField = new JTextField();
+        priceField.setEditable(false);
+
         imageField = new JTextField();
+        imageField.setEditable(false);
+
         youtubeField = new JTextField();
+        youtubeField.setEditable(false);
+
         developerField = new JTextField();
+        developerField.setEditable(false);
+
         yearField = new JTextField();
+        yearField.setEditable(false);
 
         // Add components to panel
         panel.add(new JLabel("Title:"));
@@ -89,39 +98,24 @@ public class UpdateGamePanel extends JPanel {
         return panel;
     }
 
-    private JPanel createButtonPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-
-        updateButton = new JButton("Update Game");
-        updateButton.addActionListener(e -> updateGame());
-
-        panel.add(updateButton);
-
-        return panel;
-    }
-
     private void findGame() {
         try {
             String id = idField.getText().trim();
             if (id.isEmpty()) {
-                mainApp.appendToOutput("Please enter a game ID");
+                mainApp.aggiungiOutput("Please enter a game ID");
                 return;
             }
 
-            mainApp.clearOutput();
+            mainApp.pulisciOutput();
             JSONObject game = mainApp.readGame(id);
 
             if (game.has("titolo")) {
                 displayGame(game);
-                updateButton.setEnabled(true);
-            } else {
-                updateButton.setEnabled(false);
             }
 
         } catch (Exception ex) {
-            mainApp.appendToOutput("Error finding game: " + ex.getMessage());
+            mainApp.aggiungiOutput("Error finding game: " + ex.getMessage());
             ex.printStackTrace();
-            updateButton.setEnabled(false);
         }
     }
 
@@ -149,75 +143,6 @@ public class UpdateGamePanel extends JPanel {
         descriptionArea.setCaretPosition(0);
     }
 
-    private void updateGame() {
-        try {
-            String id = idField.getText().trim();
-            if (id.isEmpty()) {
-                mainApp.appendToOutput("Game ID is missing");
-                return;
-            }
-
-            // Validate required fields
-            if (titleField.getText().isEmpty()) {
-                mainApp.appendToOutput("Title is a required field");
-                return;
-            }
-
-            // Validate PEGI field
-            String pegiText = pegiField.getText();
-            if (pegiText.isEmpty()) {
-                mainApp.appendToOutput("PEGI is a required field");
-                return;
-            }
-
-            int pegiValue;
-            try {
-                pegiValue = Integer.parseInt(pegiText);
-            } catch (NumberFormatException e) {
-                mainApp.appendToOutput("PEGI must be a valid number");
-                return;
-            }
-
-            // Create game object for update
-            JSONObject game = new JSONObject();
-            game.put("titolo", titleField.getText());
-            game.put("categoria", categoryComboBox.getSelectedItem());
-            game.put("PEGI", pegiValue);
-            game.put("descrizione", descriptionArea.getText());
-
-            // Handle price field
-            String priceText = priceField.getText();
-            double priceValue = 0.0;
-            if (!priceText.isEmpty()) {
-                try {
-                    priceValue = Double.parseDouble(priceText);
-                } catch (NumberFormatException e) {
-                    mainApp.appendToOutput("Price must be a valid number");
-                    return;
-                }
-            }
-            game.put("prezzo", priceValue);
-
-            game.put("percorso_immagine", imageField.getText());
-            game.put("youtube_link", youtubeField.getText());
-            game.put("sviluppatore", developerField.getText());
-            game.put("anno_uscita", yearField.getText());
-
-            // Send update request
-            mainApp.clearOutput();
-            JSONObject response = mainApp.updateGame(id, game);
-
-            if (response.length() > 0) {
-                // Update was successful
-                mainApp.appendToOutputWithNewline("Game updated successfully!");
-            }
-
-        } catch (Exception ex) {
-            mainApp.appendToOutput("Error updating game: " + ex.getMessage());
-            ex.printStackTrace();
-        }
-    }
-
     private void clearForm() {
         idField.setText("");
         titleField.setText("");
@@ -229,7 +154,6 @@ public class UpdateGamePanel extends JPanel {
         youtubeField.setText("");
         developerField.setText("");
         yearField.setText("");
-        mainApp.clearOutput();
-        updateButton.setEnabled(false);
+        mainApp.pulisciOutput();
     }
 }

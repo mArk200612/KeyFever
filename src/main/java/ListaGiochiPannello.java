@@ -1,24 +1,23 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class ListGamesPanel extends JPanel {
-    private GamesManagerClient mainApp;
+public class ListaGiochiPannello extends JPanel {
+    private API_CLIENT mainApp;
     private JTable gamesTable;
     private DefaultTableModel tableModel;
     private JButton refreshButton;
 
-    public ListGamesPanel(GamesManagerClient mainApp) {
+    public ListaGiochiPannello(API_CLIENT mainApp) {
         this.mainApp = mainApp;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        setBackground(GamesManagerClient.BACKGROUND_COLOR);
+        setBackground(API_CLIENT.COLORE_SFONDO);
 
         // Table panel
         JPanel tablePanel = createTablePanel();
@@ -32,12 +31,12 @@ public class ListGamesPanel extends JPanel {
     private JPanel createTablePanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(GamesManagerClient.PRIMARY_COLOR, 1),
+                BorderFactory.createLineBorder(API_CLIENT.COLORE_PRINCIPALE, 1),
                 "Games List",
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                 javax.swing.border.TitledBorder.DEFAULT_POSITION,
-                GamesManagerClient.HEADER_FONT,
-                GamesManagerClient.PRIMARY_COLOR
+                API_CLIENT.FONT_HEADER,
+                API_CLIENT.COLORE_PRINCIPALE
         ));
         panel.setBackground(Color.WHITE);
 
@@ -67,8 +66,8 @@ public class ListGamesPanel extends JPanel {
 
         // Custom header
         JTableHeader header = gamesTable.getTableHeader();
-        header.setFont(GamesManagerClient.HEADER_FONT);
-        header.setBackground(GamesManagerClient.PRIMARY_COLOR);
+        header.setFont(API_CLIENT.FONT_HEADER);
+        header.setBackground(API_CLIENT.COLORE_PRINCIPALE);
         header.setForeground(Color.BLACK);
         header.setReorderingAllowed(false);
 
@@ -92,23 +91,23 @@ public class ListGamesPanel extends JPanel {
 
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-        panel.setBackground(GamesManagerClient.BACKGROUND_COLOR);
+        panel.setBackground(API_CLIENT.COLORE_SFONDO);
 
-        refreshButton = mainApp.createStyledButton("Refresh List");
-        refreshButton.addActionListener(e -> refreshGamesList());
+        refreshButton = mainApp.creaBottone("Refresh List");
+        refreshButton.addActionListener(e -> refreshListaGiochi());
 
         panel.add(refreshButton);
 
         return panel;
     }
 
-    public void refreshGamesList() {
+    public void refreshListaGiochi() {
         try {
             // Clear existing table data
             tableModel.setRowCount(0);
 
             // Get games list
-            mainApp.clearOutput();
+            mainApp.pulisciOutput();
             JSONArray games = mainApp.listGames();
 
             // Add each game to the table
@@ -128,10 +127,10 @@ public class ListGamesPanel extends JPanel {
                 tableModel.addRow(rowData);
             }
 
-            mainApp.appendToOutputWithNewline("Total games: " + games.length());
+            mainApp.aggiungiOutputConACapo("Total games: " + games.length());
 
         } catch (Exception ex) {
-            mainApp.appendToOutput("Error loading games list: " + ex.getMessage());
+            mainApp.aggiungiOutput("Error loading games list: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
