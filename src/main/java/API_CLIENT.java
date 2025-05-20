@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+//TRADOTTO TUTTO
 public class API_CLIENT {
     private static final String API = "https://keyfever.altervista.org/API";
     protected static final Color COLORE_PRINCIPALE = new Color(70, 130, 180);

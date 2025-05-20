@@ -3,157 +3,153 @@ import java.awt.*;
 import org.json.JSONObject;
 
 public class LeggiGiocoPannello extends JPanel {
-    private API_CLIENT mainApp;
-    private JTextField idField, titleField, pegiField, priceField, imageField, youtubeField, developerField, yearField;
-    private JTextArea descriptionArea;
-    private JComboBox<String> categoryComboBox;
+    private API_CLIENT app;
+    private JTextField campoID, campoTitolo, campoPEGI, campoPrezzo, campoImmagine, campoYouTube, campoSviluppatore, campoAnno;
+    private JTextArea descrizione;
+    private JComboBox<String> categorieComboBox;
 
-    public LeggiGiocoPannello(API_CLIENT mainApp) {
-        this.mainApp = mainApp;
+    public LeggiGiocoPannello(API_CLIENT app) {
+        this.app = app;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Search panel at top
-        JPanel searchPanel = createSearchPanel();
-        add(searchPanel, BorderLayout.NORTH);
+        JPanel pannelloDiRicerca = creaPannelloDiRicerca();
+        add(pannelloDiRicerca, BorderLayout.NORTH);
 
-        // Game details panel
-        JPanel detailsPanel = createDetailsPanel();
-        add(detailsPanel, BorderLayout.CENTER);
+        JPanel pannelloDettagli = creaPannelloDettagli();
+        add(pannelloDettagli, BorderLayout.CENTER);
     }
 
-    private JPanel createSearchPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Find Game by ID"));
+    private JPanel creaPannelloDiRicerca() {
+        JPanel pannello = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        pannello.setBorder(BorderFactory.createTitledBorder("Cerca gioco dall'ID"));
 
-        JLabel idLabel = new JLabel("Game ID:");
-        idField = new JTextField(10);
-        JButton searchButton = new JButton("Search");
-        searchButton.addActionListener(e -> findGame());
+        JLabel idLabel = new JLabel("ID gioco: ");
+        campoID = new JTextField(10);
+        JButton bottoneDiRicerca = new JButton("Cerca");
+        bottoneDiRicerca.addActionListener(e -> findGame());
 
-        JButton clearButton = new JButton("Clear Form");
-        clearButton.addActionListener(e -> clearForm());
+        JButton bottonePulisci = new JButton("Pulisci");
+        bottonePulisci.addActionListener(e -> clearForm());
 
-        panel.add(idLabel);
-        panel.add(idField);
-        panel.add(searchButton);
-        panel.add(clearButton);
+        pannello.add(idLabel);
+        pannello.add(campoID);
+        pannello.add(bottoneDiRicerca);
+        pannello.add(bottonePulisci);
 
-        return panel;
+        return pannello;
     }
 
-    private JPanel createDetailsPanel() {
-        JPanel panel = new JPanel(new GridLayout(9, 2, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Game Details"));
+    private JPanel creaPannelloDettagli() {
+        JPanel pannello = new JPanel(new GridLayout(9, 2, 10, 10));
+        pannello.setBorder(BorderFactory.createTitledBorder("Dettagli del gioco"));
 
-        // Initialize fields (all read-only)
-        titleField = new JTextField();
-        titleField.setEditable(false);
+        campoTitolo = new JTextField();
+        campoTitolo.setEditable(false);
 
-        categoryComboBox = new JComboBox<>(API_CLIENT.getCategorieGiochi());
-        categoryComboBox.setEnabled(false);
+        categorieComboBox = new JComboBox<>(API_CLIENT.getCategorieGiochi());
+        categorieComboBox.setEnabled(false);
 
-        pegiField = new JTextField();
-        pegiField.setEditable(false);
+        campoPEGI = new JTextField();
+        campoPEGI.setEditable(false);
 
-        descriptionArea = new JTextArea(5, 20);
-        descriptionArea.setEditable(false);
-        JScrollPane descScrollPane = new JScrollPane(descriptionArea);
+        descrizione = new JTextArea(5, 20);
+        descrizione.setEditable(false);
+        JScrollPane descScrollPane = new JScrollPane(descrizione);
 
-        priceField = new JTextField();
-        priceField.setEditable(false);
+        campoPrezzo = new JTextField();
+        campoPrezzo.setEditable(false);
 
-        imageField = new JTextField();
-        imageField.setEditable(false);
+        campoImmagine = new JTextField();
+        campoImmagine.setEditable(false);
 
-        youtubeField = new JTextField();
-        youtubeField.setEditable(false);
+        campoYouTube = new JTextField();
+        campoYouTube.setEditable(false);
 
-        developerField = new JTextField();
-        developerField.setEditable(false);
+        campoSviluppatore = new JTextField();
+        campoSviluppatore.setEditable(false);
 
-        yearField = new JTextField();
-        yearField.setEditable(false);
+        campoAnno = new JTextField();
+        campoAnno.setEditable(false);
 
-        // Add components to panel
-        panel.add(new JLabel("Title:"));
-        panel.add(titleField);
-        panel.add(new JLabel("Category:"));
-        panel.add(categoryComboBox);
-        panel.add(new JLabel("PEGI Rating:"));
-        panel.add(pegiField);
-        panel.add(new JLabel("Description:"));
-        panel.add(descScrollPane);
-        panel.add(new JLabel("Price:"));
-        panel.add(priceField);
-        panel.add(new JLabel("Image Path:"));
-        panel.add(imageField);
-        panel.add(new JLabel("YouTube Link:"));
-        panel.add(youtubeField);
-        panel.add(new JLabel("Developer:"));
-        panel.add(developerField);
-        panel.add(new JLabel("Release Year:"));
-        panel.add(yearField);
+        pannello.add(new JLabel("Titolo:"));
+        pannello.add(campoTitolo);
+        pannello.add(new JLabel("Categorie:"));
+        pannello.add(categorieComboBox);
+        pannello.add(new JLabel("PEGI:"));
+        pannello.add(campoPEGI);
+        pannello.add(new JLabel("Descrizione:"));
+        pannello.add(descScrollPane);
+        pannello.add(new JLabel("Prezzo:"));
+        pannello.add(campoPrezzo);
+        pannello.add(new JLabel("Percorso dell'immagine:"));
+        pannello.add(campoImmagine);
+        pannello.add(new JLabel("Link di YouTube:"));
+        pannello.add(campoYouTube);
+        pannello.add(new JLabel("Sviluppatore:"));
+        pannello.add(campoSviluppatore);
+        pannello.add(new JLabel("Anno di rilascio:"));
+        pannello.add(campoAnno);
 
-        return panel;
+        return pannello;
     }
 
     private void findGame() {
         try {
-            String id = idField.getText().trim();
+            String id = campoID.getText().trim();
             if (id.isEmpty()) {
-                mainApp.aggiungiOutput("Please enter a game ID");
+                app.aggiungiOutput("Please enter a game ID");
                 return;
             }
 
-            mainApp.pulisciOutput();
-            JSONObject game = mainApp.readGame(id);
+            app.pulisciOutput();
+            JSONObject game = app.readGame(id);
 
             if (game.has("titolo")) {
                 displayGame(game);
             }
 
         } catch (Exception ex) {
-            mainApp.aggiungiOutput("Error finding game: " + ex.getMessage());
+            app.aggiungiOutput("Error finding game: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
 
     private void displayGame(JSONObject game) {
-        titleField.setText(game.getString("titolo"));
+        campoTitolo.setText(game.getString("titolo"));
 
         // Set category
         String category = game.optString("categoria", "");
-        for (int i = 0; i < categoryComboBox.getItemCount(); i++) {
-            if (categoryComboBox.getItemAt(i).equals(category)) {
-                categoryComboBox.setSelectedIndex(i);
+        for (int i = 0; i < categorieComboBox.getItemCount(); i++) {
+            if (categorieComboBox.getItemAt(i).equals(category)) {
+                categorieComboBox.setSelectedIndex(i);
                 break;
             }
         }
 
-        pegiField.setText(String.valueOf(game.optInt("PEGI", 0)));
-        descriptionArea.setText(game.optString("descrizione", ""));
-        priceField.setText(String.valueOf(game.optDouble("prezzo", 0)));
-        imageField.setText(game.optString("percorso_immagine", ""));
-        youtubeField.setText(game.optString("youtube_link", ""));
-        developerField.setText(game.optString("sviluppatore", ""));
-        yearField.setText(game.optString("anno_uscita", ""));
+        campoPEGI.setText(String.valueOf(game.optInt("PEGI", 0)));
+        descrizione.setText(game.optString("descrizione", ""));
+        campoPrezzo.setText(String.valueOf(game.optDouble("prezzo", 0)));
+        campoImmagine.setText(game.optString("percorso_immagine", ""));
+        campoYouTube.setText(game.optString("youtube_link", ""));
+        campoSviluppatore.setText(game.optString("sviluppatore", ""));
+        campoAnno.setText(game.optString("anno_uscita", ""));
 
         // Scroll description to top
-        descriptionArea.setCaretPosition(0);
+        descrizione.setCaretPosition(0);
     }
 
     private void clearForm() {
-        idField.setText("");
-        titleField.setText("");
-        categoryComboBox.setSelectedIndex(0);
-        pegiField.setText("");
-        descriptionArea.setText("");
-        priceField.setText("");
-        imageField.setText("");
-        youtubeField.setText("");
-        developerField.setText("");
-        yearField.setText("");
-        mainApp.pulisciOutput();
+        campoID.setText("");
+        campoTitolo.setText("");
+        categorieComboBox.setSelectedIndex(0);
+        campoPEGI.setText("");
+        descrizione.setText("");
+        campoPrezzo.setText("");
+        campoImmagine.setText("");
+        campoYouTube.setText("");
+        campoSviluppatore.setText("");
+        campoAnno.setText("");
+        app.pulisciOutput();
     }
 }

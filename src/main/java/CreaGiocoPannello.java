@@ -2,9 +2,10 @@ import javax.swing.*;
 import java.awt.*;
 import org.json.JSONObject;
 
+//TRADOTTO TUTTO
 public class CreaGiocoPannello extends JPanel {
     private final API_CLIENT app;
-    private JTextField campoTitolo, campoPEGI, campoPrezzo, campoImmagine, campoYoutube, campoSviluppatore, campoAnno;
+    private JTextField campoTitolo, campoPEGI, campoPrezzo, campoImmagine, campoYouTube, campoSviluppatore, campoAnno;
     private JTextArea descrizione;
     private JComboBox<String> categorieComboBox;
 
@@ -49,7 +50,7 @@ public class CreaGiocoPannello extends JPanel {
         JScrollPane descScrollPane = new JScrollPane(descrizione);
         campoPrezzo = creaAreaDiTesto();
         campoImmagine = creaAreaDiTesto();
-        campoYoutube = creaAreaDiTesto();
+        campoYouTube = creaAreaDiTesto();
         campoSviluppatore = creaAreaDiTesto();
         campoAnno = creaAreaDiTesto();
 
@@ -93,7 +94,7 @@ public class CreaGiocoPannello extends JPanel {
         gbc.gridx = 0; gbc.gridy = 6; gbc.weightx = 0;
         pannello.add(new JLabel("Link a YouTube:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
-        pannello.add(campoYoutube, gbc);
+        pannello.add(campoYouTube, gbc);
 
         // Riga 7: Sviluppatore
         gbc.gridx = 0; gbc.gridy = 7; gbc.weightx = 0;
@@ -198,7 +199,7 @@ public class CreaGiocoPannello extends JPanel {
             }
 
             gioco.put("percorso_immagine", campoImmagine.getText());
-            gioco.put("youtube_link", campoYoutube.getText());
+            gioco.put("youtube_link", campoYouTube.getText());
             gioco.put("sviluppatore", campoSviluppatore.getText());
             gioco.put("anno_uscita", campoAnno.getText());
 
@@ -222,7 +223,7 @@ public class CreaGiocoPannello extends JPanel {
         descrizione.setText("");
         campoPrezzo.setText("");
         campoImmagine.setText("");
-        campoYoutube.setText("");
+        campoYouTube.setText("");
         campoSviluppatore.setText("");
         campoAnno.setText("");
         app.pulisciOutput();
