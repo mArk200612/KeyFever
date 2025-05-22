@@ -8,129 +8,125 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ListaGiochiPannello extends JPanel {
-    private API_CLIENT mainApp;
-    private JTable gamesTable;
-    private DefaultTableModel tableModel;
-    private JButton refreshButton;
+    private final ClientAPI app;
+    private DefaultTableModel modelloTabella;
 
-    public ListaGiochiPannello(API_CLIENT mainApp) {
-        this.mainApp = mainApp;
+    public ListaGiochiPannello(ClientAPI app) {
+        this.app = app;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        setBackground(API_CLIENT.COLORE_SFONDO);
+        setBackground(ClientAPI.COLORE_SFONDO);
 
-        // Table panel
-        JPanel tablePanel = createTablePanel();
-        add(tablePanel, BorderLayout.CENTER);
+        JPanel pannelloTabella = creaPannelloTabella();
+        add(pannelloTabella, BorderLayout.CENTER);
 
-        // Button panel
-        JPanel buttonPanel = createButtonPanel();
-        add(buttonPanel, BorderLayout.SOUTH);
+        JPanel pannelloBottone = creaPannelloBottone();
+        add(pannelloBottone, BorderLayout.SOUTH);
     }
 
-    private JPanel createTablePanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(API_CLIENT.COLORE_PRINCIPALE, 1),
-                "Games List",
+    private JPanel creaPannelloTabella() {
+        JPanel pannello = new JPanel(new BorderLayout());
+        pannello.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(ClientAPI.COLORE_PRINCIPALE, 1),
+                "Lista dei giochi",
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                 javax.swing.border.TitledBorder.DEFAULT_POSITION,
-                API_CLIENT.FONT_HEADER,
-                API_CLIENT.COLORE_PRINCIPALE
+                ClientAPI.FONT_HEADER,
+                ClientAPI.COLORE_PRINCIPALE
         ));
-        panel.setBackground(Color.WHITE);
+        pannello.setBackground(Color.WHITE);
 
-        // Create table model with column names
-        String[] columnNames = {"ID", "Title", "Category", "PEGI", "Price", "Developer", "Year"};
-        tableModel = new DefaultTableModel(columnNames, 0) {
+        String[] nomiColonne = {"ID", "Titolo", "Categoria", "PEGI", "Prezzo", "Sviluppatore", "Anno", "Disponibilità"};
+        modelloTabella = new DefaultTableModel(nomiColonne, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(int riga, int colonna) {
                 return false;
             }
         };
 
-        // Create table with custom renderer
-        gamesTable = new JTable(tableModel);
-        gamesTable.setSelectionBackground(Color.WHITE);
-        gamesTable.setSelectionForeground(Color.BLACK);
-        gamesTable.setFocusable(false);
+        JTable tabellaGiochi = getTabellaGiochi();
 
-        // Customize table appearance
-        gamesTable.setFillsViewportHeight(true);
-        gamesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        gamesTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        gamesTable.setRowHeight(25);
-        gamesTable.setShowGrid(false);
-        gamesTable.setIntercellSpacing(new Dimension(0, 0));
-        gamesTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-
-        // Custom header
-        JTableHeader header = gamesTable.getTableHeader();
-        header.setFont(API_CLIENT.FONT_HEADER);
-        header.setBackground(API_CLIENT.COLORE_PRINCIPALE);
+        JTableHeader header = tabellaGiochi.getTableHeader();
+        header.setFont(ClientAPI.FONT_HEADER);
+        header.setBackground(ClientAPI.COLORE_PRINCIPALE);
         header.setForeground(Color.BLACK);
         header.setReorderingAllowed(false);
 
-        // Set column widths
-        TableColumnModel columnModel = gamesTable.getColumnModel();
-        columnModel.getColumn(0).setPreferredWidth(50);    // ID
-        columnModel.getColumn(1).setPreferredWidth(200);   // Title
-        columnModel.getColumn(2).setPreferredWidth(120);   // Category
-        columnModel.getColumn(3).setPreferredWidth(50);    // PEGI
-        columnModel.getColumn(4).setPreferredWidth(70);    // Price
-        columnModel.getColumn(5).setPreferredWidth(150);   // Developer
-        columnModel.getColumn(6).setPreferredWidth(70);    // Year
+        TableColumnModel modelloColonna = tabellaGiochi.getColumnModel();
+        modelloColonna.getColumn(0).setPreferredWidth(50);
+        modelloColonna.getColumn(1).setPreferredWidth(200);
+        modelloColonna.getColumn(2).setPreferredWidth(120);
+        modelloColonna.getColumn(3).setPreferredWidth(50);
+        modelloColonna.getColumn(4).setPreferredWidth(70);
+        modelloColonna.getColumn(5).setPreferredWidth(150);
+        modelloColonna.getColumn(6).setPreferredWidth(70);
+        modelloColonna.getColumn(7).setPreferredWidth(100);
 
-        // Add table to scroll pane
-        JScrollPane scrollPane = new JScrollPane(gamesTable);
+
+        JScrollPane scrollPane = new JScrollPane(tabellaGiochi);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        panel.add(scrollPane, BorderLayout.CENTER);
+        pannello.add(scrollPane, BorderLayout.CENTER);
 
-        return panel;
+        return pannello;
     }
 
-    private JPanel createButtonPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-        panel.setBackground(API_CLIENT.COLORE_SFONDO);
+    private JTable getTabellaGiochi() {
+        JTable tabellaGiochi = new JTable(modelloTabella);
+        tabellaGiochi.setSelectionBackground(Color.WHITE);
+        tabellaGiochi.setSelectionForeground(Color.BLACK);
+        tabellaGiochi.setFocusable(false);
 
-        refreshButton = mainApp.creaBottone("Refresh List");
-        refreshButton.addActionListener(e -> refreshListaGiochi());
-
-        panel.add(refreshButton);
-
-        return panel;
+        tabellaGiochi.setFillsViewportHeight(true);
+        tabellaGiochi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabellaGiochi.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tabellaGiochi.setRowHeight(25);
+        tabellaGiochi.setShowGrid(false);
+        tabellaGiochi.setIntercellSpacing(new Dimension(0, 0));
+        tabellaGiochi.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        return tabellaGiochi;
     }
 
-    public void refreshListaGiochi() {
+    private JPanel creaPannelloBottone() {
+        JPanel pannello = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        pannello.setBackground(ClientAPI.COLORE_SFONDO);
+
+        JButton bottoneAggiorna = app.creaBottone("Aggiorna lista");
+        bottoneAggiorna.addActionListener(_ -> aggiornaListaGiochi());
+
+        pannello.add(bottoneAggiorna);
+
+        return pannello;
+    }
+
+    public void aggiornaListaGiochi() {
         try {
-            // Clear existing table data
-            tableModel.setRowCount(0);
+            modelloTabella.setRowCount(0);
 
-            // Get games list
-            mainApp.pulisciOutput();
-            JSONArray games = mainApp.listGames();
+            app.pulisciOutput();
+            JSONArray giochi = app.listGames();
 
-            // Add each game to the table
-            for (int i = 0; i < games.length(); i++) {
-                JSONObject game = games.getJSONObject(i);
+            for (int i = 0; i < giochi.length(); i++) {
+                JSONObject gioco = giochi.getJSONObject(i);
 
-                Object[] rowData = {
-                        (Object) game.getInt("id_gioco"),
-                        game.getString("titolo"),
-                        game.optString("categoria", ""),
-                        (Object) game.optInt("PEGI", 0),
-                        (Object) game.optDouble("prezzo", 0.0),
-                        game.optString("sviluppatore", ""),
-                        game.optString("anno_uscita", "")
+                Object[] datiRiga = {
+                        gioco.getInt("id_gioco"),
+                        gioco.getString("titolo"),
+                        gioco.optString("categoria", ""),
+                        gioco.optInt("PEGI", 0),
+                        gioco.optDouble("prezzo", 0.0),
+                        gioco.optString("sviluppatore", ""),
+                        gioco.optString("anno_uscita", ""),
+                        gioco.optString("disponibilita", "")
+
                 };
 
-                tableModel.addRow(rowData);
+                modelloTabella.addRow(datiRiga);
             }
 
-            mainApp.aggiungiOutputConACapo("Total games: " + games.length());
+            app.aggiungiOutputConACapo("Totale giochi: " + giochi.length());
 
         } catch (Exception ex) {
-            mainApp.aggiungiOutput("Error loading games list: " + ex.getMessage());
+            app.aggiungiOutput("Errore nel caricamento della lista dei giochi: " + ex.getMessage());
             ex.printStackTrace();
         }
     }

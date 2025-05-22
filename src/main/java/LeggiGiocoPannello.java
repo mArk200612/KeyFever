@@ -2,13 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 import org.json.JSONObject;
 
+// TRADOTTO TUTTO
 public class LeggiGiocoPannello extends JPanel {
-    private API_CLIENT app;
-    private JTextField campoID, campoTitolo, campoPEGI, campoPrezzo, campoImmagine, campoYouTube, campoSviluppatore, campoAnno;
+    private ClientAPI app;
+    private JTextField campoID, campoTitolo, campoPEGI, campoPrezzo, campoImmagine, campoYouTube, campoSviluppatore, campoAnno, campoDisponibilita;
     private JTextArea descrizione;
     private JComboBox<String> categorieComboBox;
 
-    public LeggiGiocoPannello(API_CLIENT app) {
+    public LeggiGiocoPannello(ClientAPI app) {
         this.app = app;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -27,10 +28,10 @@ public class LeggiGiocoPannello extends JPanel {
         JLabel idLabel = new JLabel("ID gioco: ");
         campoID = new JTextField(10);
         JButton bottoneDiRicerca = new JButton("Cerca");
-        bottoneDiRicerca.addActionListener(e -> findGame());
+        bottoneDiRicerca.addActionListener(e -> cercaGioco());
 
         JButton bottonePulisci = new JButton("Pulisci");
-        bottonePulisci.addActionListener(e -> clearForm());
+        bottonePulisci.addActionListener(e -> pulisci());
 
         pannello.add(idLabel);
         pannello.add(campoID);
@@ -47,7 +48,7 @@ public class LeggiGiocoPannello extends JPanel {
         campoTitolo = new JTextField();
         campoTitolo.setEditable(false);
 
-        categorieComboBox = new JComboBox<>(API_CLIENT.getCategorieGiochi());
+        categorieComboBox = new JComboBox<>(ClientAPI.getCategorieGiochi());
         categorieComboBox.setEnabled(false);
 
         campoPEGI = new JTextField();
@@ -72,56 +73,69 @@ public class LeggiGiocoPannello extends JPanel {
         campoAnno = new JTextField();
         campoAnno.setEditable(false);
 
+        campoDisponibilita = new JTextField();
+        campoDisponibilita.setEditable(false);
+
         pannello.add(new JLabel("Titolo:"));
         pannello.add(campoTitolo);
+
         pannello.add(new JLabel("Categorie:"));
         pannello.add(categorieComboBox);
+
         pannello.add(new JLabel("PEGI:"));
         pannello.add(campoPEGI);
+
         pannello.add(new JLabel("Descrizione:"));
         pannello.add(descScrollPane);
+
         pannello.add(new JLabel("Prezzo:"));
         pannello.add(campoPrezzo);
+
         pannello.add(new JLabel("Percorso dell'immagine:"));
         pannello.add(campoImmagine);
+
         pannello.add(new JLabel("Link di YouTube:"));
         pannello.add(campoYouTube);
+
         pannello.add(new JLabel("Sviluppatore:"));
         pannello.add(campoSviluppatore);
+
         pannello.add(new JLabel("Anno di rilascio:"));
         pannello.add(campoAnno);
+
+        pannello.add(new JLabel("Disponibilità:"));
+        pannello.add(campoDisponibilita);
 
         return pannello;
     }
 
-    private void findGame() {
+    private void cercaGioco() {
         try {
             String id = campoID.getText().trim();
             if (id.isEmpty()) {
-                app.aggiungiOutput("Please enter a game ID");
+                app.aggiungiOutput("Perfavore inserisci un ID");
                 return;
             }
 
             app.pulisciOutput();
-            JSONObject game = app.readGame(id);
+            JSONObject gioco = app.cercaGioco(id);
 
-            if (game.has("titolo")) {
-                displayGame(game);
+            if (gioco.has("titolo")) {
+                mostraGioco(gioco);
             }
 
         } catch (Exception ex) {
-            app.aggiungiOutput("Error finding game: " + ex.getMessage());
+            app.aggiungiOutput("Errore nella ricerca del gioco: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
 
-    private void displayGame(JSONObject game) {
+    private void mostraGioco(JSONObject game) {
         campoTitolo.setText(game.getString("titolo"));
 
-        // Set category
-        String category = game.optString("categoria", "");
+        String categoria = game.optString("categoria", "");
         for (int i = 0; i < categorieComboBox.getItemCount(); i++) {
-            if (categorieComboBox.getItemAt(i).equals(category)) {
+            if (categorieComboBox.getItemAt(i).equals(categoria)) {
                 categorieComboBox.setSelectedIndex(i);
                 break;
             }
@@ -134,12 +148,12 @@ public class LeggiGiocoPannello extends JPanel {
         campoYouTube.setText(game.optString("youtube_link", ""));
         campoSviluppatore.setText(game.optString("sviluppatore", ""));
         campoAnno.setText(game.optString("anno_uscita", ""));
+        campoDisponibilita.setText(game.optString("disponibilita", ""));
 
-        // Scroll description to top
         descrizione.setCaretPosition(0);
     }
 
-    private void clearForm() {
+    private void pulisci() {
         campoID.setText("");
         campoTitolo.setText("");
         categorieComboBox.setSelectedIndex(0);
@@ -150,6 +164,7 @@ public class LeggiGiocoPannello extends JPanel {
         campoYouTube.setText("");
         campoSviluppatore.setText("");
         campoAnno.setText("");
+        campoDisponibilita.setText("");
         app.pulisciOutput();
     }
 }

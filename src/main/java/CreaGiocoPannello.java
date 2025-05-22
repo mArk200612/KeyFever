@@ -1,19 +1,21 @@
-import javax.swing.*;
-import java.awt.*;
 import org.json.JSONObject;
 
+import javax.swing.*;
+import java.awt.*;
+
 //TRADOTTO TUTTO
+
 public class CreaGiocoPannello extends JPanel {
-    private final API_CLIENT app;
-    private JTextField campoTitolo, campoPEGI, campoPrezzo, campoImmagine, campoYouTube, campoSviluppatore, campoAnno;
+    private final ClientAPI app;
+    private JTextField campoTitolo, campoPEGI, campoPrezzo, campoImmagine, campoYouTube, campoSviluppatore, campoAnno, campoDisponibilita;
     private JTextArea descrizione;
     private JComboBox<String> categorieComboBox;
 
-    public CreaGiocoPannello(API_CLIENT app) {
+    public CreaGiocoPannello(ClientAPI app) {
         this.app = app;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        setBackground(API_CLIENT.COLORE_SFONDO);
+        setBackground(ClientAPI.COLORE_SFONDO);
 
         JPanel formPanel = creaPannelloForm();
         add(formPanel, BorderLayout.CENTER);
@@ -25,12 +27,12 @@ public class CreaGiocoPannello extends JPanel {
     private JPanel creaPannelloForm() {
         JPanel pannello = new JPanel(new GridBagLayout());
         pannello.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(API_CLIENT.COLORE_PRINCIPALE, 1),
+                BorderFactory.createLineBorder(ClientAPI.COLORE_PRINCIPALE, 1),
                 "Crea un nuovo gioco",
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                 javax.swing.border.TitledBorder.DEFAULT_POSITION,
-                API_CLIENT.FONT_HEADER,
-                API_CLIENT.COLORE_PRINCIPALE
+                ClientAPI.FONT_HEADER,
+                ClientAPI.COLORE_PRINCIPALE
         ));
         pannello.setBackground(Color.WHITE);
         pannello.setBorder(BorderFactory.createCompoundBorder(
@@ -55,58 +57,94 @@ public class CreaGiocoPannello extends JPanel {
         campoAnno = creaAreaDiTesto();
 
         // Riga 0: Titolo
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         pannello.add(new JLabel("Titolo:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         pannello.add(campoTitolo, gbc);
 
         // Riga 1: Categoria
-        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0;
         pannello.add(new JLabel("Categoria:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         pannello.add(categorieComboBox, gbc);
 
         // Riga 2: PEGI
-        gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 0;
         pannello.add(new JLabel("PEGI:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         pannello.add(campoPEGI, gbc);
 
         // Riga 3: Descrizione
-        gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.weightx = 0;
         pannello.add(new JLabel("Descrizione:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         pannello.add(descScrollPane, gbc);
 
         // Riga 4: Prezzo
-        gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weightx = 0;
         pannello.add(new JLabel("Prezzo:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         pannello.add(campoPrezzo, gbc);
 
         // Riga 5: Percorso Immagine
-        gbc.gridx = 0; gbc.gridy = 5; gbc.weightx = 0;
-        pannello.add(new JLabel("Percorso Immagine:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.weightx = 0;
+        pannello.add(new JLabel("Percorso immagine:"), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         pannello.add(campoImmagine, gbc);
 
         // Riga 6: Link a YouTube
-        gbc.gridx = 0; gbc.gridy = 6; gbc.weightx = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.weightx = 0;
         pannello.add(new JLabel("Link a YouTube:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         pannello.add(campoYouTube, gbc);
 
         // Riga 7: Sviluppatore
-        gbc.gridx = 0; gbc.gridy = 7; gbc.weightx = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.weightx = 0;
         pannello.add(new JLabel("Sviluppatore:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         pannello.add(campoSviluppatore, gbc);
 
         // Riga 8: Anno di rilascio
-        gbc.gridx = 0; gbc.gridy = 8; gbc.weightx = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.weightx = 0;
         pannello.add(new JLabel("Anno di rilascio:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         pannello.add(campoAnno, gbc);
+
+        // Riga 8: Disponibilità
+        gbc.gridx = 0;
+        gbc.gridy = 9;
+        gbc.weightx = 0;
+        pannello.add(new JLabel("Disponibilità:"), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        campoDisponibilita = creaAreaDiTesto();
+        pannello.add(campoDisponibilita, gbc);
 
         gbc.gridy = 9;
         gbc.weighty = 1.0;
@@ -117,14 +155,14 @@ public class CreaGiocoPannello extends JPanel {
 
     private JPanel creaPannelloBottone() {
         JPanel pannello = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-        pannello.setBackground(API_CLIENT.COLORE_SFONDO);
+        pannello.setBackground(ClientAPI.COLORE_SFONDO);
 
         JButton bottoneCrea = app.creaBottone("Crea gioco");
         bottoneCrea.addActionListener(_ -> creaGioco());
 
         JButton bottonePulisci = app.creaBottone("Pulisci");
         bottonePulisci.setBackground(new Color(220, 220, 220));
-        bottonePulisci.setForeground(API_CLIENT.COLORE_TESTO);
+        bottonePulisci.setForeground(ClientAPI.COLORE_TESTO);
         bottonePulisci.addActionListener(_ -> pulisci());
 
         pannello.add(bottoneCrea);
@@ -143,7 +181,7 @@ public class CreaGiocoPannello extends JPanel {
     }
 
     private JComboBox<String> creaComboBox() {
-        JComboBox<String> comboBox = new JComboBox<>(API_CLIENT.getCategorieGiochi());
+        JComboBox<String> comboBox = new JComboBox<>(ClientAPI.getCategorieGiochi());
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> lista, Object valore, int indice,
@@ -202,6 +240,7 @@ public class CreaGiocoPannello extends JPanel {
             gioco.put("youtube_link", campoYouTube.getText());
             gioco.put("sviluppatore", campoSviluppatore.getText());
             gioco.put("anno_uscita", campoAnno.getText());
+            gioco.put("disponibilita", campoDisponibilita.getText());
 
             app.pulisciOutput();
             JSONObject risposta = app.creaGioco(gioco);
@@ -226,6 +265,7 @@ public class CreaGiocoPannello extends JPanel {
         campoYouTube.setText("");
         campoSviluppatore.setText("");
         campoAnno.setText("");
+        campoDisponibilita.setText("");
         app.pulisciOutput();
     }
 }

@@ -2,163 +2,165 @@ import javax.swing.*;
 import java.awt.*;
 import org.json.JSONObject;
 
-public class EliminaGiocoPannello extends JPanel {
-    private API_CLIENT mainApp;
-    private JTextField idField, titleField, categoryField, pegiField;
-    private JButton deleteButton;
+// TRADOTTO TUTTO
 
-    public EliminaGiocoPannello(API_CLIENT mainApp) {
-        this.mainApp = mainApp;
+public class EliminaGiocoPannello extends JPanel {
+    private final ClientAPI app;
+    private JTextField campoID, campoTitolo, campoCategoria, campoPEGI, campoDisponibilita;
+    private JButton bottoneElimina;
+
+    public EliminaGiocoPannello(ClientAPI app) {
+        this.app = app;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Search panel
-        JPanel searchPanel = createSearchPanel();
-        add(searchPanel, BorderLayout.NORTH);
+        JPanel pannelloDiRicerca = creaPannelloDiRicerca();
+        add(pannelloDiRicerca, BorderLayout.NORTH);
 
-        // Game preview panel
-        JPanel previewPanel = createPreviewPanel();
-        add(previewPanel, BorderLayout.CENTER);
+        JPanel pannelloAnteprima = creaPannelloAnteprima();
+        add(pannelloAnteprima, BorderLayout.CENTER);
 
-        // Button panel
-        JPanel buttonPanel = createButtonPanel();
-        add(buttonPanel, BorderLayout.SOUTH);
+        JPanel pannelloBottone = creaPannelloBottone();
+        add(pannelloBottone, BorderLayout.SOUTH);
 
-        // Initially disable delete button
-        deleteButton.setEnabled(false);
+        bottoneElimina.setEnabled(false);
     }
 
-    private JPanel createSearchPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Find Game to Delete"));
+    private JPanel creaPannelloDiRicerca() {
+        JPanel pannello = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        pannello.setBorder(BorderFactory.createTitledBorder("Cerca un gioco da eliminare"));
 
-        JLabel idLabel = new JLabel("Game ID:");
-        idField = new JTextField(10);
-        JButton searchButton = new JButton("Search");
-        searchButton.addActionListener(e -> findGame());
+        JLabel idLabel = new JLabel("ID del gioco::");
+        campoID = new JTextField(10);
+        JButton bottoneCerca = new JButton("Cerca");
+        bottoneCerca.addActionListener(_ -> cercaGioco());
 
-        JButton clearButton = new JButton("Clear");
-        clearButton.addActionListener(e -> clearForm());
+        JButton bottonePulisci = new JButton("Pulisci");
+        bottonePulisci.addActionListener(_ -> pulisci());
 
-        panel.add(idLabel);
-        panel.add(idField);
-        panel.add(searchButton);
-        panel.add(clearButton);
+        pannello.add(idLabel);
+        pannello.add(campoID);
+        pannello.add(bottoneCerca);
+        pannello.add(bottonePulisci);
 
-        return panel;
+        return pannello;
     }
 
-    private JPanel createPreviewPanel() {
+    private JPanel creaPannelloAnteprima() {
         JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Game Preview"));
+        panel.setBorder(BorderFactory.createTitledBorder("Anteprima del gioco"));
 
-        // Simple read-only fields to show key game info
-        titleField = new JTextField();
-        titleField.setEditable(false);
+        campoTitolo = new JTextField();
+        campoTitolo.setEditable(false);
 
-        categoryField = new JTextField();
-        categoryField.setEditable(false);
+        campoCategoria = new JTextField();
+        campoCategoria.setEditable(false);
 
-        pegiField = new JTextField();
-        pegiField.setEditable(false);
+        campoPEGI = new JTextField();
+        campoPEGI.setEditable(false);
 
-        panel.add(new JLabel("Title:"));
-        panel.add(titleField);
-        panel.add(new JLabel("Category:"));
-        panel.add(categoryField);
-        panel.add(new JLabel("PEGI Rating:"));
-        panel.add(pegiField);
+        campoDisponibilita = new JTextField();
+        campoDisponibilita.setEditable(false);
 
-        return panel;
-    }
 
-    private JPanel createButtonPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-
-        deleteButton = new JButton("Delete Game");
-        deleteButton.setBackground(new Color(255, 100, 100));
-        deleteButton.addActionListener(e -> confirmDelete());
-
-        panel.add(deleteButton);
+        panel.add(new JLabel("Titolo:"));
+        panel.add(campoTitolo);
+        panel.add(new JLabel("Categoria:"));
+        panel.add(campoCategoria);
+        panel.add(new JLabel("PEGI:"));
+        panel.add(campoPEGI);
+        panel.add(new JLabel("Disponibilità:"));
+        panel.add(campoDisponibilita);
 
         return panel;
     }
 
-    private void findGame() {
+    private JPanel creaPannelloBottone() {
+        JPanel pannello = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+
+        bottoneElimina = new JButton("Delete Game");
+        bottoneElimina.setBackground(new Color(255, 100, 100));
+        bottoneElimina.addActionListener(_ -> confermaEliminazione());
+
+        pannello.add(bottoneElimina);
+
+        return pannello;
+    }
+
+    private void cercaGioco() {
         try {
-            String id = idField.getText().trim();
+            String id = campoID.getText().trim();
             if (id.isEmpty()) {
-                mainApp.aggiungiOutput("Please enter a game ID");
+                app.aggiungiOutput("Perfavore inserisci un ID");
                 return;
             }
 
-            mainApp.pulisciOutput();
-            JSONObject game = mainApp.readGame(id);
+            app.pulisciOutput();
+            JSONObject gioco = app.cercaGioco(id);
 
-            if (game.has("titolo")) {
-                // Display preview of game
-                titleField.setText(game.getString("titolo"));
-                categoryField.setText(game.optString("categoria", ""));
-                pegiField.setText(String.valueOf(game.optInt("PEGI", 0)));
+            if (gioco.has("titolo")) {
+                campoTitolo.setText(gioco.getString("titolo"));
+                campoCategoria.setText(gioco.optString("categoria", ""));
+                campoPEGI.setText(String.valueOf(gioco.optInt("PEGI", 0)));
+                campoDisponibilita.setText(gioco.optString("disponibilita", ""));
 
-                // Enable delete button
-                deleteButton.setEnabled(true);
+                bottoneElimina.setEnabled(true);
             } else {
-                deleteButton.setEnabled(false);
+                bottoneElimina.setEnabled(false);
             }
 
         } catch (Exception ex) {
-            mainApp.aggiungiOutput("Error finding game: " + ex.getMessage());
+            app.aggiungiOutput("Errore nella ricerca del gioco: " + ex.getMessage());
             ex.printStackTrace();
-            deleteButton.setEnabled(false);
+            bottoneElimina.setEnabled(false);
         }
     }
 
-    private void confirmDelete() {
-        String id = idField.getText().trim();
-        String title = titleField.getText();
+    private void confermaEliminazione() {
+        String id = campoID.getText().trim();
+        String titolo = campoTitolo.getText();
 
-        int result = JOptionPane.showConfirmDialog(
+        int risultato = JOptionPane.showConfirmDialog(
                 this,
-                "Are you sure you want to delete the game:\n" + title + " (ID: " + id + ")?",
-                "Confirm Deletion",
+                "Sei sicuro di voler eliminare questo gioco?\n" + titolo + " (ID: " + id + ")?",
+                "Conferma eliminazione",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE
         );
 
-        if (result == JOptionPane.YES_OPTION) {
-            deleteGame();
+        if (risultato == JOptionPane.YES_OPTION) {
+            eliminaGioco();
         }
     }
 
-    private void deleteGame() {
+    private void eliminaGioco() {
         try {
-            String id = idField.getText().trim();
+            String id = campoID.getText().trim();
             if (id.isEmpty()) {
-                mainApp.aggiungiOutput("Game ID is missing");
+                app.aggiungiOutput("ID del gioco mancante");
                 return;
             }
 
-            mainApp.pulisciOutput();
-            JSONObject response = mainApp.deleteGame(id);
+            app.pulisciOutput();
+            JSONObject risposta = app.deleteGame(id);
 
-            if (response.length() > 0) {
-                // Delete was successful, clear the form
-                clearForm();
+            if (!risposta.isEmpty()) {
+                pulisci();
             }
 
         } catch (Exception ex) {
-            mainApp.aggiungiOutput("Error deleting game: " + ex.getMessage());
+            app.aggiungiOutput("Errore nell'eliminazione del gioco: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
 
-    private void clearForm() {
-        idField.setText("");
-        titleField.setText("");
-        categoryField.setText("");
-        pegiField.setText("");
-        mainApp.pulisciOutput();
-        deleteButton.setEnabled(false);
+    private void pulisci() {
+        campoID.setText("");
+        campoTitolo.setText("");
+        campoCategoria.setText("");
+        campoPEGI.setText("");
+        campoDisponibilita.setText("");
+        app.pulisciOutput();
+        bottoneElimina.setEnabled(false);
     }
 }

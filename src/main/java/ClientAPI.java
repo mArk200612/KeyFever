@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 //TRADOTTO TUTTO
-public class API_CLIENT {
+public class ClientAPI {
     private static final String API = "https://keyfever.altervista.org/API";
     protected static final Color COLORE_PRINCIPALE = new Color(70, 130, 180);
     private static final Color COLORE_SECONDARIO = new Color(100, 149, 237);
@@ -34,7 +34,7 @@ public class API_CLIENT {
 
         EventQueue.invokeLater(() -> {
             try {
-                API_CLIENT finestra = new API_CLIENT();
+                ClientAPI finestra = new ClientAPI();
                 finestra.frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -42,7 +42,7 @@ public class API_CLIENT {
         });
     }
 
-    public API_CLIENT() {
+    public ClientAPI() {
         inizzializza();
     }
 
@@ -73,13 +73,13 @@ public class API_CLIENT {
         EliminaGiocoPannello eliminaPannello = new EliminaGiocoPannello(this);
         listaPannello = new ListaGiochiPannello(this);
 
-        cardPanel.add(creaPannello, "create");
-        cardPanel.add(leggiPannello, "read");
-        cardPanel.add(aggiornaPannello, "update");
-        cardPanel.add(eliminaPannello, "delete");
-        cardPanel.add(listaPannello, "list");
+        cardPanel.add(creaPannello, "crea");
+        cardPanel.add(leggiPannello, "leggi");
+        cardPanel.add(aggiornaPannello, "aggiorna");
+        cardPanel.add(eliminaPannello, "elimina");
+        cardPanel.add(listaPannello, "lista");
 
-        cardLayout.show(cardPanel, "create");
+        cardLayout.show(cardPanel, "crea");
 
         frame.setLayout(new BorderLayout());
         frame.add(navPanel, BorderLayout.NORTH);
@@ -107,7 +107,7 @@ public class API_CLIENT {
         bottoneElimina.addActionListener(_ -> cardLayout.show(cardPanel, "elimina"));
         bottoneLista.addActionListener(_ -> {
             cardLayout.show(cardPanel, "lista");
-            listaPannello.refreshListaGiochi();
+            listaPannello.aggiornaListaGiochi();
         });
 
         navPanel.add(bottoneCrea);
@@ -168,7 +168,7 @@ public class API_CLIENT {
         return gestisciRisposta(connessione, "creato", true);
     }
 
-    public JSONObject readGame(String id) throws Exception {
+    public JSONObject cercaGioco(String id) throws Exception {
         HttpURLConnection connsessione = (HttpURLConnection) new URI(API + "/read.php?id=" + id).toURL().openConnection();
         connsessione.setRequestMethod("GET");
 
